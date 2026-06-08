@@ -173,6 +173,7 @@ return [
                 'basic' => 'Basic View',
                 'advanced' => 'Advanced View',
                 'expert' => 'Expert View',
+				'custom' => 'Custom View',
             ],
             'value' => $config['adminpanel']['view'],
         ],

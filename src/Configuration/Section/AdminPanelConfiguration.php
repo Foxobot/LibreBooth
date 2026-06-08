@@ -13,10 +13,20 @@ final class AdminPanelConfiguration
             ->ignoreExtraKeys()
             ->children()
                 ->enumNode('view')
-                    ->values(['basic', 'advanced', 'expert'])
+                    ->values(['basic', 'advanced', 'expert', 'custom'])
                     ->defaultValue('basic')
                     ->end()
                 ->booleanNode('experimental_settings')->defaultValue(false)->end()
+				/**
+                 * ------------------------------------
+                 * Custom view whitelist
+                 * ------------------------------------
+                 * List of setting keys shown in custom view
+                 */
+                ->arrayNode('custom_settings')
+                    ->scalarPrototype()->end()
+                    ->defaultValue([])
+                ->end()
             ->end();
     }
 }
