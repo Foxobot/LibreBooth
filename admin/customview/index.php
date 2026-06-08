@@ -8,6 +8,7 @@ use Photobooth\Utility\PathUtility;
 $languageService = LanguageService::getInstance();
 
 $pageTitle = 'Custom View Settings';
+$configsetup = require PathUtility::getAbsolutePath('lib/configsetup.inc.php');
 
 include PathUtility::getAbsolutePath('admin/components/head.admin.php');
 include PathUtility::getAbsolutePath('admin/helper/index.php');
