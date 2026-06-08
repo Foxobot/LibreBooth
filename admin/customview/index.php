@@ -8,24 +8,37 @@ use Photobooth\Utility\PathUtility;
 $languageService = LanguageService::getInstance();
 
 $pageTitle = 'Custom View Settings';
+
 include PathUtility::getAbsolutePath('admin/components/head.admin.php');
 include PathUtility::getAbsolutePath('admin/helper/index.php');
 
 $customSettings = $config['adminpanel']['custom_settings'] ?? [];
 
-// handle submit
+/**
+ * -------------------------------------------------
+ * Handle form submit
+ * -------------------------------------------------
+ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $selected = $_POST['custom_settings'] ?? [];
 
+    // normalize array values
     $config['adminpanel']['custom_settings'] = array_values($selected);
 
-    // IMPORTANT: use existing config save system here
+    /**
+     * IMPORTANT:
+     * Use existing Photobooth config persistence mechanism here.
+     * Replace saveConfig() if your project uses another function.
+     */
     saveConfig($config);
 
     header('Location: ' . $_SERVER['REQUEST_URI']);
     exit;
 }
+
+?>
+
 <div class="w-full min-h-screen bg-brand-2 px-6 py-12 overflow-auto">
 
     <div class="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-xl p-6">
@@ -41,14 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php foreach ($configsetup as $section => $fields): ?>
                     <?php foreach ($fields as $key => $setting): ?>
 
-                        <?php if (in_array($key, ['platform', 'view'])) continue; ?>
+                        <?php if (in_array($key, ['platform', 'view'], true)) continue; ?>
 
                         <?php
                             $name = $setting['name'] ?? $key;
+                            $label = $setting['label'] ?? $name;
                             $checked = in_array($name, $customSettings, true);
                         ?>
 
-                        <label class="flex items-center gap-2 p-2 border rounded">
+                        <label class="flex items-center gap-2 p-2 border rounded hover:bg-gray-50">
 
                             <input
                                 type="checkbox"
@@ -57,10 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <?= $checked ? 'checked' : '' ?>
                             >
 
-                            <div>
+                            <div class="flex flex-col">
                                 <div class="font-semibold">
-                                    <?= htmlspecialchars($setting['label'] ?? $name) ?>
+                                    <?= htmlspecialchars($label) ?>
                                 </div>
+
                                 <div class="text-xs text-gray-500">
                                     <?= htmlspecialchars($section) ?>
                                 </div>
@@ -73,14 +88,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             </div>
 
-            <button type="submit" class="mt-6 btn btn-primary">
-                Save
-            </button>
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="btn btn-primary">
+                    Save Custom View
+                </button>
+            </div>
 
         </form>
 
     </div>
 
 </div>
+
+<?php
 include PathUtility::getAbsolutePath('admin/components/footer.scripts.php');
 include PathUtility::getAbsolutePath('admin/components/footer.admin.php');
+?>
