@@ -2,57 +2,45 @@
 
 require_once __DIR__ . '/../admin_boot.php';
 
-use Photobooth\Service\LanguageService;
 use Photobooth\Utility\PathUtility;
+use Photobooth\Service\LanguageService;
 
 $languageService = LanguageService::getInstance();
 
 $pageTitle = 'Custom View Settings';
+
+// load config definitions
 $configsetup = require PathUtility::getAbsolutePath('lib/configsetup.inc.php');
+
+// current config
+$customSettings = $config['adminpanel']['custom_settings'] ?? [];
 
 include PathUtility::getAbsolutePath('admin/components/head.admin.php');
 include PathUtility::getAbsolutePath('admin/helper/index.php');
 
-$customSettings = $config['adminpanel']['custom_settings'] ?? [];
-
-/**
- * -------------------------------------------------
- * Handle form submit
- * -------------------------------------------------
- */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $selected = $_POST['custom_settings'] ?? [];
-
-    // normalize array values
-    $config['adminpanel']['custom_settings'] = array_values($selected);
-
-    /**
-     * IMPORTANT:
-     * Use existing Photobooth config persistence mechanism here.
-     * Replace saveConfig() if your project uses another function.
-     */
-    saveConfig($config);
-
-    header('Location: ' . $_SERVER['REQUEST_URI']);
-    exit;
-}
-
 ?>
 
-<div class="w-full min-h-screen bg-brand-2 px-6 py-12 overflow-auto">
+<div class="w-full h-full flex flex-col overflow-hidden bg-brand-2 px-6 py-12">
 
-    <div class="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-xl p-6">
+    <div class="w-full max-w-5xl mx-auto bg-white rounded-lg shadow-xl p-6 flex flex-col h-full">
 
         <h1 class="text-xl font-bold mb-6">
             Custom View Settings
         </h1>
 
-        <form method="POST">
+        <!-- IMPORTANT:
+             This MUST behave like normal admin form -->
+        <form class="flex flex-col flex-1 overflow-hidden">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- scrollable area -->
+            <div class="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pr-2">
 
                 <?php foreach ($configsetup as $section => $fields): ?>
+
+                    <div class="col-span-full mt-4 mb-2 font-bold text-gray-600">
+                        <?= htmlspecialchars($section) ?>
+                    </div>
+
                     <?php foreach ($fields as $key => $setting): ?>
 
                         <?php if (in_array($key, ['platform', 'view'], true)) continue; ?>
@@ -63,13 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $checked = in_array($name, $customSettings, true);
                         ?>
 
-                        <label class="flex items-center gap-2 p-2 border rounded hover:bg-gray-50">
+                        <label class="flex items-start gap-2 p-3 border rounded hover:bg-gray-50 cursor-pointer">
 
                             <input
                                 type="checkbox"
-                                name="custom_settings[]"
+                                name="adminpanel[custom_settings][]"
                                 value="<?= htmlspecialchars($name) ?>"
                                 <?= $checked ? 'checked' : '' ?>
+                                class="mt-1"
                             >
 
                             <div class="flex flex-col">
@@ -85,14 +74,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </label>
 
                     <?php endforeach; ?>
+
                 <?php endforeach; ?>
 
             </div>
 
-            <div class="mt-6 flex justify-end">
-                <button type="submit" class="btn btn-primary">
-                    Save Custom View
-                </button>
+            <!-- IMPORTANT: reuse global admin save button -->
+            <div class="mt-6 flex justify-end shrink-0">
+                <?php
+                    // reuse existing admin save system
+                    echo \Photobooth\Utility\AdminInput::renderCta('save', 'save-admin-btn');
+                ?>
             </div>
 
         </form>

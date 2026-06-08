@@ -124,7 +124,13 @@ if ($action === 'reset') {
 } elseif ($action === 'config') {
     $logger->debug('Saving Photobooth configuration...');
     $newConfig = ArrayUtility::mergeRecursive($defaultConfig, $data);
-
+	
+	// Handle Custom View settings (adminpanel custom filter)
+	if (isset($data['adminpanel']['custom_settings'])) {
+		$data['adminpanel']['custom_settings'] = array_values(
+			$data['adminpanel']['custom_settings']
+		);
+	}
     $rootPath = PathUtility::getRootPath();
 
     $normalizePath = static function (?string $path) use ($rootPath): ?string {

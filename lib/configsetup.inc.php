@@ -183,6 +183,12 @@ return [
             'name' => 'adminpanel[experimental_settings]',
             'value' => $config['adminpanel']['experimental_settings'],
         ],
+		'adminpanel_custom_settings' => [
+			'view' => 'expert',
+			'type' => 'hidden', 
+			'name' => 'adminpanel[custom_settings]',
+			'value' => $config['adminpanel']['custom_settings'] ?? [],
+		],
         'dev_demo_images' => [
             'view' => 'basic',
             'type' => 'checkbox',
