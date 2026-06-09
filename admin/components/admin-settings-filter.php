@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append(csrf.key, csrf.token);
         }
 
-        fetch('../api/admin.php', {
+        fetch('../../api/admin.php', {
             method: 'POST',
             body: formData
         })
