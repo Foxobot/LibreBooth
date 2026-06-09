@@ -8,6 +8,7 @@ require_once __DIR__ . '/../admin/admin_boot.php';
 use Photobooth\Collage;
 use Photobooth\Enum\FolderEnum;
 use Photobooth\Environment;
+use Photobooth\Service\AdminSettingsFilterService;
 use Photobooth\Service\ConfigurationService;
 use Photobooth\Service\DatabaseManagerService;
 use Photobooth\Service\ImageMetadataCacheService;
@@ -381,6 +382,40 @@ if ($action === 'reset') {
         ]);
     } catch (\Exception $exception) {
         $logger->error('ERROR: Config can not be saved!', ['error' => $exception->getMessage()]);
+        echo json_encode([
+            'status' => 'error',
+            'message' => $exception->getMessage(),
+        ]);
+    }
+} elseif ($action === 'admin_filter') {
+    $logger->debug('Saving admin settings filter...');
+    
+    $filterDataJson = $data['admin_filter'] ?? null;
+    $filterData = null;
+
+    if ($filterDataJson && $filterDataJson !== 'null') {
+        $filterData = json_decode($filterDataJson, true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $logger->error('ERROR: Invalid filter JSON.', ['error' => json_last_error_msg()]);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid filter data.',
+            ]);
+            exit;
+        }
+    }
+    
+    try {
+        $filterService = AdminSettingsFilterService::getInstance();
+        $filterService->update($filterData);
+        $logger->debug('Admin settings filter saved.');
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Admin settings filter saved.',
+        ]);
+    } catch (\Exception $exception) {
+        $logger->error('ERROR: Admin settings filter can not be saved!', ['error' => $exception->getMessage()]);
         echo json_encode([
             'status' => 'error',
             'message' => $exception->getMessage(),
