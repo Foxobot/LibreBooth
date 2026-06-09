@@ -1,9 +1,11 @@
 <?php
 
+use Photobooth\Service\AdminSettingsFilterService;
 use Photobooth\Service\LanguageService;
 use Photobooth\Utility\AdminInput;
 
 $languageService = LanguageService::getInstance();
+$filterService = AdminSettingsFilterService::getInstance();
 
 foreach ($configsetup as $section => $fields) {
 
@@ -27,6 +29,11 @@ foreach ($configsetup as $section => $fields) {
     $col = 0;
     foreach ($fields as $key => $setting) {
         if (in_array($key, ['platform', 'view'])) {
+            continue;
+        }
+
+        // Apply admin settings filter
+        if (!$filterService->isSettingVisible($section, $key)) {
             continue;
         }
 
